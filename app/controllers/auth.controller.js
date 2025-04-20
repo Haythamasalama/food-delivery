@@ -11,7 +11,7 @@ const { sendEmail } = require("../utils/emailSender");
 // Signup Controller
 exports.signup = async (req, res) => {
   try {
-    const { fullName, email, password, phone, acceptedPolicy } = req.body;
+    const { fullName, email, password, phone, role } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -19,11 +19,11 @@ exports.signup = async (req, res) => {
     }
     
     const user = await User.create({
-      fullName: req.body.fullName,
-      email: req.body.email,
-      password: bcrypt.hashSync(req.body.password, 10),
-      phone: req.body.phone,
-      role: req.body.role,
+      fullName,
+      email,
+      password: bcrypt.hashSync(password, 10),
+      phone,
+      role,
       isVerified: false,
     });
 
