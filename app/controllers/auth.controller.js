@@ -11,6 +11,13 @@ const { sendEmail } = require("../utils/emailSender");
 // Signup Controller
 exports.signup = async (req, res) => {
   try {
+    const { fullName, email, password, phone, acceptedPolicy } = req.body;
+
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).send({ message: "User already registered" });
+    }
+    
     const user = await User.create({
       fullName: req.body.fullName,
       email: req.body.email,
