@@ -1,99 +1,69 @@
-const jwt = require("jsonwebtoken");
-
-("use strict");
+"use strict";
 module.exports = (sequelize, Sequelize) => {
-  const User = sequelize.define("Users", {
-    userId: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      field: "user_id",
-    },
-    fullName: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      field: "full_name",
-    },
-    email: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true,
+  const User = sequelize.define(
+    "Users",
+    {
+      userId: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER,
+        field: "user_id",
       },
-      field: "email",
+      fullName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        field: "full_name",
+      },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          isEmail: true,
+        },
+        field: "email",
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: true, // ✅ allow null for OAuth users
+        field: "password",
+      },
+      role: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "customer", // ✅ default for Google users
+        field: "role",
+      },
+      isVerified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true, // ✅ Google users are verified by default
+        field: "is_verified",
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
+        field: "created_at",
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
+        field: "updated_at",
+      },
+      deletedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+        field: "deleted_at",
+      },
     },
-    password: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      field: "password",
-    },
-    phone: {
-      type: Sequelize.STRING,
-      allowNull: true,
-      field: "phone",
-    },
-    role: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      defaultValue: "student",
-      field: "role",
-    },
-    isVerified: {
-      type: Sequelize.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-      field: "is_verified",
-    },
-    verificationCode: {
-      type: Sequelize.STRING(6),
-      allowNull: true,
-      field: "verification_code",
-    },
-    verificationCodeExpires: {
-      type: Sequelize.DATE,
-      allowNull: true,
-      field: "verification_code_expires",
-    },
-    createdAt: {
-      type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW,
-      field: "created_at",
-    },
-    updatedAt: {
-      type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW,
-      field: "updated_at",
-    },
-    deletedAt: {
-      type: Sequelize.DATE,
-      allowNull: true,
-      field: "deleted_at",
-    },
-    createdBy: {
-      type: Sequelize.INTEGER,
-      allowNull: true,
-      field: "created_by",
-    },
-    updatedBy: {
-      type: Sequelize.INTEGER,
-      allowNull: true,
-      field: "updated_by",
-    },
-    deletedBy: {
-      type: Sequelize.INTEGER,
-      allowNull: true,
-      field: "deleted_by",
-    },
-  });
-
-  User.prototype.generateJwt = function () {
-    return jwt.sign(
-      { userId: user.userId, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-  };
+    {
+      tableName: "Users",
+      timestamps: true,
+      paranoid: true, // allows soft deletes
+      underscored: true,
+    }
+  );
 
   return User;
 };

@@ -18,8 +18,15 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.User = require("./user.model")(sequelize, Sequelize);
-db.Student = require("./student.model")(sequelize, Sequelize);
+db.Customer = require("./customer.model")(sequelize, Sequelize);
 
 // Establish relationships
+db.User.hasOne(db.Customer, {
+  foreignKey: "user_id",
+});
+
+db.Customer.belongsTo(db.User, {
+  foreignKey: "user_id",
+});
 
 module.exports = db;

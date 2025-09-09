@@ -62,8 +62,8 @@ const checkAdmin = async (req, res, next) => {
   }
 };
 
-// Check Student Role
-const checkStudent = async (req, res, next) => {
+// Check Customer Role
+const checkCustomer = async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const user = await User.findByPk(userId);
@@ -72,11 +72,11 @@ const checkStudent = async (req, res, next) => {
       return res.status(404).send({ message: `User ${userId} Not found!` });
     }
 
-    if (user.role === "student") {
+    if (user.role === "customer") {
       return next();
     }
 
-    res.status(403).send({ message: "Require Student Role!" });
+    res.status(403).send({ message: "Require Customer Role!" });
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });
   }
@@ -91,5 +91,5 @@ module.exports = {
   verifyToken,
   blacklistToken,
   checkAdmin,
-  checkStudent,
+  checkCustomer,
 };

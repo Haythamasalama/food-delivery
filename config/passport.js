@@ -2,6 +2,7 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const db = require("../db/models");
 const User = db.User;
+const Customer = db.Customer;
 
 // Serialize & deserialize
 passport.serializeUser((user, done) => {
@@ -9,11 +10,12 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (userId, done) => {
-  const user = await User.findByPk(userId);
+  const user = await User.findByPk(userId, { include: Customer });
   done(null, user);
 });
 
 // Google OAuth Strategy
+// Inside GoogleStrategy verify function
 passport.use(
   new GoogleStrategy(
     {
@@ -23,16 +25,24 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const [user] = await User.findOrCreate({
+        const [user, created] = await db.User.findOrCreate({
           where: { email: profile.emails[0].value },
           defaults: {
             fullName: profile.displayName,
-            password: "google-pass", // or a placeholder
-            phone: null, // ✅ must match DB model and table
-            role: "student",
-            is_verified: true,
+            password: null, // no password for Google login
+            role: "customer",
+            isVerified: true,
           },
         });
+
+        // Create a blank customer profile if new user
+        if (created) {
+          await db.Customer.create({
+            userId: user.userId,
+            phone: null,
+            location: null,
+          });
+        }
 
         return done(null, user);
       } catch (err) {

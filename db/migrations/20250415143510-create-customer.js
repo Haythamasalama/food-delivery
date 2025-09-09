@@ -2,63 +2,23 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Students", {
-      studentId: {
+    await queryInterface.createTable("Customers", {
+      customerId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
-        field: "student_id",
+        field: "customer_id",
       },
       location: {
         type: Sequelize.STRING,
         allowNull: true,
         field: "location",
       },
-      jobTitle: {
+      phone: {
         type: Sequelize.STRING,
         allowNull: true,
-        field: "job_title",
-      },
-      company: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        field: "company",
-      },
-      industry: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        field: "industry",
-      },
-      language: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        defaultValue: "English",
-        field: "language",
-      },
-      timeZone: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        field: "time_zone",
-      },
-      notifyAccountUpdates: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: true,
-        field: "notify_account_updates",
-      },
-      notifyProductNews: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-        field: "notify_product_news",
-      },
-      notifyMarketing: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-        field: "notify_marketing",
-      },
-      bio: {
-        type: Sequelize.STRING(200),
-        allowNull: true,
+        field: "phone",
       },
       userId: {
         type: Sequelize.INTEGER,
@@ -102,6 +62,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Students");
+    await queryInterface.dropTable("Customers");
   },
 };

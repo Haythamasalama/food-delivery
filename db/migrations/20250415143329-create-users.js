@@ -26,24 +26,19 @@ module.exports = {
       },
       password: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true, // ✅ allow null for OAuth users
         field: "password",
-      },
-      phone: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        field: "phone",
       },
       role: {
         type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: "student",
+        defaultValue: "customer", // ✅ default for Google users
         field: "role",
       },
       isVerified: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false,
+        defaultValue: true, // ✅ Google users are verified by default
         field: "is_verified",
       },
       createdAt: {
@@ -60,21 +55,6 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
         field: "deleted_at",
-      },
-      createdBy: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        field: "created_by",
-      },
-      updatedBy: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        field: "updated_by",
-      },
-      deletedBy: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        field: "deleted_by",
       },
     });
   },

@@ -1,54 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
-const { validateRequest, verifySignUp, authJwt } = require("../middlewares");
+const passport = require("../../config/passport");
 const authController = require("../controllers/auth.controller");
+const { authJwt } = require("../middlewares");
 
-// Signup route
-router.post(
-  "/signup",
-  [
-    validateRequest.validateSignup,
-    verifySignUp.checkDuplicateEmail,
-    verifySignUp.checkRoleExisted,
-  ],
-  authController.signup
-);
-
-router.post("/login", [validateRequest.validateLogin], authController.login);
-
-router.post("/logout", [authJwt.verifyToken], authController.logout);
-
-router.post("/verify-code", authController.verifyCode);
-
-router.post("/request-reset", authController.requestResetCode);
-
-router.post("/reset-password", authController.resetPassword);
-
-// Step 1: Start Google login
+// Google OAuth
 router.get(
   "/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  })
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-// Step 2: Callback after Google login
 router.get(
-  "/",
-  passport.authenticate("google", {
-    successRedirect: "/api/auth/success",
-    failureRedirect: "/api/auth/failure",
-  })
+  "/google/callback",
+  passport.authenticate("google", { failureRedirect: "/api/auth/failure" }),
+  authController.googleSuccess
 );
 
-// Optional Success/Failure routes
-router.get("/success", (req, res) => {
-  res.send("✅ Login successful! Welcome, " + req.user.displayName);
-});
+router.get("/failure", authController.googleFailure);
 
-router.get("/failure", (req, res) => {
-  res.send("❌ Login failed.");
-});
+router.post("/logout", [authJwt.verifyToken], authController.logout);
 
 module.exports = router;
