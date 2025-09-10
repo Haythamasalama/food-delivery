@@ -8,7 +8,7 @@ const validate = require("../middlewares/validate");
 // Customer completes profile
 router.put(
   "/complete-profile",
-  [authJwt.verifyToken, validate(completeProfileSchema)],
+  [authJwt.verifyToken, authJwt.checkCustomer, validate(completeProfileSchema)],
   customerController.completeProfile
 );
 

@@ -82,6 +82,70 @@ const checkCustomer = async (req, res, next) => {
   }
 };
 
+// Check Driver Role
+const checkDriver = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).send({ message: `User ${userId} Not found!` });
+    }
+
+    if (user.role === "driver") {
+      return next();
+    }
+
+    res.status(403).send({ message: "Require Driver Role!" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
+
+const checkAdminOrDriverOrCustomer = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).send({ message: `User ${userId} Not found!` });
+    }
+
+    if (
+      user.role === "driver" ||
+      user.role === "admin" ||
+      user.role === "customer"
+    ) {
+      return next();
+    }
+
+    res
+      .status(403)
+      .send({ message: "Require Admin or Driver or customer Role!" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
+
+const checkAdminOrDriver = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).send({ message: `User ${userId} Not found!` });
+    }
+
+    if (user.role === "driver" || user.role === "admin") {
+      return next();
+    }
+
+    res.status(403).send({ message: "Require Admin or Driver Role!" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
+
 // Add token to blacklist
 const blacklistToken = (token) => {
   blacklist.add(token);
@@ -92,4 +156,7 @@ module.exports = {
   blacklistToken,
   checkAdmin,
   checkCustomer,
+  checkDriver,
+  checkAdminOrDriverOrCustomer,
+  checkAdminOrDriver,
 };

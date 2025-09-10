@@ -3,6 +3,16 @@ const router = express.Router();
 const passport = require("../../config/passport");
 const authController = require("../controllers/auth.controller");
 const { authJwt } = require("../middlewares");
+const {
+  validateSignup,
+  validateLogin,
+} = require("../validation/auth.validation");
+
+// signup
+router.post("/signup", validateSignup, authController.signup);
+
+// Local login
+router.post("/login", validateLogin, authController.localLogin);
 
 // Google OAuth
 router.get(
