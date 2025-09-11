@@ -11,7 +11,7 @@ exports.placeOrder = async (req, res) => {
     if (!customer)
       return res.status(404).send({ message: "Customer not found" });
 
-    const { itemId, quantity } = req.body;
+    const { itemId, quantity, driverId } = req.body;
     const item = await MenuItem.findByPk(itemId);
     if (!item) return res.status(404).send({ message: "Menu item not found" });
 
@@ -21,6 +21,7 @@ exports.placeOrder = async (req, res) => {
       customerId: customer.customerId,
       itemId,
       quantity,
+      driverId,
       totalPrice,
       status: "confirmed",
     });
@@ -35,36 +36,39 @@ exports.placeOrder = async (req, res) => {
 exports.trackOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
+    const timeout = 30000; // (30)s max hold time for long poll
+    const pollInterval = 2000; // (2s) how often to check DB while holding connection
 
-    let attempts = 0;
-    const interval = 6000; // 6s
-    const maxAttempts = 20; // up to 2min
     let lastStatus = null;
+    let timer;
 
     const checkStatus = async () => {
-      attempts++;
       const order = await Order.findByPk(orderId, { include: [MenuItem] });
 
-      if (!order) return res.status(404).send({ message: "Order not found" });
+      if (!order) {
+        clearTimeout(timer);
+        return res.status(404).send({ message: "Order not found" });
+      }
 
-      // First iteration → set baseline status
+      // If first run → set baseline status
       if (lastStatus === null) {
         lastStatus = order.status;
       }
 
-      // ✅ If status changed OR delivered → return immediately
+      // ✅ If status changed OR delivered → respond immediately
       if (order.status !== lastStatus || order.status === "delivered") {
+        clearTimeout(timer);
         return res.status(200).send({ order });
       }
 
-      // ✅ If max attempts reached → return current status
-      if (attempts >= maxAttempts) {
-        return res.status(200).send({ order });
-      }
-
-      // Keep waiting
-      setTimeout(checkStatus, interval);
+      // Otherwise keep checking until timeout
+      setTimeout(checkStatus, pollInterval);
     };
+
+    // Force timeout after 30s → client should reconnect
+    timer = setTimeout(() => {
+      return res.status(200).send({ message: "No change", status: lastStatus });
+    }, timeout);
 
     checkStatus();
   } catch (error) {
