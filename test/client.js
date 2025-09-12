@@ -6,7 +6,7 @@ socket.on("connect", () => {
   console.log("Connected as client:", socket.id);
 
   // Join order room (simulate customer)
-  socket.emit("joinOrderRoom", { orderId: 1, customerId: 6 });
+  socket.emit("joinOrderRoom", { orderId: 4, customerId: 6 });
 });
 
 // Listen for location updates from server

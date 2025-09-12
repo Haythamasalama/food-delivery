@@ -2,28 +2,40 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Menu_Items", {
-      itemId: {
+    await queryInterface.createTable("Staffs", {
+      staffId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
-        field: "item_id",
+        field: "staff_id",
       },
-      name: {
+      fullName: {
         type: Sequelize.STRING,
         allowNull: false,
-        field: "name",
+        field: "full_name",
       },
-      description: {
+      phone: {
         type: Sequelize.STRING,
+        allowNull: false,
+      },
+      userId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "users",
+          key: "user_id",
+        },
+        field: "user_id",
+      },
+      restaurantId: {
+        type: Sequelize.INTEGER,
         allowNull: true,
-        field: "description",
-      },
-      price: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-        field: "price",
+        field: "restaurant_id",
+        references: {
+          model: "Restaurants",
+          key: "restaurant_id",
+        },
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -43,6 +55,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Menu_Items");
+    await queryInterface.dropTable("Staffs");
   },
 };

@@ -23,24 +23,58 @@ db.MenuItem = require("./menuItem.model")(sequelize, Sequelize);
 db.Order = require("./order.model")(sequelize, Sequelize);
 db.Driver = require("./driver.model")(sequelize, Sequelize);
 db.DriverLocation = require("./driverlocation.model")(sequelize, Sequelize);
+db.Restaurant = require("./restaurants.model")(sequelize, Sequelize);
+db.RestaurantNotification = require("./restaurantNotifications.model")(
+  sequelize,
+  Sequelize
+);
+db.Staff = require("./staff.model")(sequelize, Sequelize);
 
 // Establish relationships
+// User → Customer / Driver
 db.User.hasOne(db.Customer, { foreignKey: "user_id" });
 db.Customer.belongsTo(db.User, { foreignKey: "user_id" });
 
 db.User.hasOne(db.Driver, { foreignKey: "user_id" });
 db.Driver.belongsTo(db.User, { foreignKey: "user_id" });
 
+// Customer → Order
 db.Customer.hasMany(db.Order, { foreignKey: "customer_id" });
 db.Order.belongsTo(db.Customer, { foreignKey: "customer_id" });
 
-db.MenuItem.hasMany(db.Order, { foreignKey: "item_id" });
-db.Order.belongsTo(db.MenuItem, { foreignKey: "item_id" });
-
+// Driver → Order
 db.Driver.hasMany(db.Order, { foreignKey: "driver_id" });
 db.Order.belongsTo(db.Driver, { foreignKey: "driver_id" });
 
+// Driver → Location
 db.Driver.hasOne(db.DriverLocation, { foreignKey: "driver_id" });
 db.DriverLocation.belongsTo(db.Driver, { foreignKey: "driver_id" });
+
+// Restaurant → MenuItem
+db.Restaurant.hasMany(db.MenuItem, { foreignKey: "restaurant_id" });
+db.MenuItem.belongsTo(db.Restaurant, {
+  foreignKey: "restaurant_id",
+  as: "restaurant",
+});
+
+// Order → MenuItem
+db.MenuItem.hasMany(db.Order, { foreignKey: "item_id" });
+db.Order.belongsTo(db.MenuItem, { foreignKey: "item_id" });
+
+// Restaurant → Notifications
+db.Restaurant.hasMany(db.RestaurantNotification, {
+  foreignKey: "restaurant_id",
+});
+db.RestaurantNotification.belongsTo(db.Restaurant, {
+  foreignKey: "restaurant_id",
+});
+
+// Order → Notifications
+db.Order.hasMany(db.RestaurantNotification, { foreignKey: "order_id" });
+db.RestaurantNotification.belongsTo(db.Order, { foreignKey: "order_id" });
+
+// Restaurant → Staff
+db.Restaurant.hasMany(db.Staff, { foreignKey: "restaurant_id" });
+db.Staff.belongsTo(db.Restaurant, { foreignKey: "restaurant_id" });
 
 module.exports = db;

@@ -1,8 +1,8 @@
 "use strict";
-module.exports = (sequelize, Sequelize) => {
-  const MenuItem = sequelize.define(
-    "Menu_Items",
-    {
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("Menu_Items", {
       itemId: {
         allowNull: false,
         autoIncrement: true,
@@ -49,13 +49,9 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
         field: "deleted_at",
       },
-    },
-    {
-      tableName: "Menu_Items",
-      timestamps: true,
-      paranoid: true,
-      underscored: true,
-    }
-  );
-  return MenuItem;
+    });
+  },
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable("Menu_Items");
+  },
 };

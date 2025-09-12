@@ -146,6 +146,25 @@ const checkAdminOrDriver = async (req, res, next) => {
   }
 };
 
+const checkStaff = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).send({ message: `User ${userId} Not found!` });
+    }
+
+    if (user.role === "staff") {
+      return next();
+    }
+
+    res.status(403).send({ message: "Require Staff Role!" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
+
 // Add token to blacklist
 const blacklistToken = (token) => {
   blacklist.add(token);
@@ -159,4 +178,5 @@ module.exports = {
   checkDriver,
   checkAdminOrDriverOrCustomer,
   checkAdminOrDriver,
+  checkStaff,
 };

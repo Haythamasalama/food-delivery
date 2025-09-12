@@ -1,38 +1,35 @@
 "use strict";
-module.exports = (sequelize, Sequelize) => {
-  const MenuItem = sequelize.define(
-    "Menu_Items",
-    {
-      itemId: {
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("Restaurants", {
+      restaurantId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
-        field: "item_id",
-      },
-      restaurantId: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
         field: "restaurant_id",
-        references: {
-          model: "Restaurants",
-          key: "restaurant_id",
-        },
       },
       name: {
         type: Sequelize.STRING,
         allowNull: false,
         field: "name",
       },
-      description: {
+      address: {
         type: Sequelize.STRING,
         allowNull: true,
-        field: "description",
+        field: "address",
       },
-      price: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-        field: "price",
+      phone: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        field: "phone",
+      },
+      createdBy: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        field: "created_by", // optional user who created the restaurant
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -49,13 +46,10 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
         field: "deleted_at",
       },
-    },
-    {
-      tableName: "Menu_Items",
-      timestamps: true,
-      paranoid: true,
-      underscored: true,
-    }
-  );
-  return MenuItem;
+    });
+  },
+
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable("Restaurants");
+  },
 };

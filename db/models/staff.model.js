@@ -1,14 +1,32 @@
 "use strict";
 module.exports = (sequelize, Sequelize) => {
-  const MenuItem = sequelize.define(
-    "Menu_Items",
+  const Staff = sequelize.define(
+    "Staffs",
     {
-      itemId: {
+      staffId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
-        field: "item_id",
+        field: "staff_id",
+      },
+      fullName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        field: "full_name",
+      },
+      phone: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      userId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "users",
+          key: "user_id",
+        },
+        field: "user_id",
       },
       restaurantId: {
         type: Sequelize.INTEGER,
@@ -18,21 +36,6 @@ module.exports = (sequelize, Sequelize) => {
           model: "Restaurants",
           key: "restaurant_id",
         },
-      },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        field: "name",
-      },
-      description: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        field: "description",
-      },
-      price: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-        field: "price",
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -51,11 +54,12 @@ module.exports = (sequelize, Sequelize) => {
       },
     },
     {
-      tableName: "Menu_Items",
+      tableName: "Staffs",
       timestamps: true,
       paranoid: true,
       underscored: true,
     }
   );
-  return MenuItem;
+
+  return Staff;
 };

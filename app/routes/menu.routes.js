@@ -6,7 +6,7 @@ const { authJwt } = require("../middlewares");
 // Admin adds new item
 router.post(
   "/",
-  [authJwt.verifyToken, authJwt.checkAdmin],
+  [authJwt.verifyToken, authJwt.checkStaff],
   menuController.addMenuItem
 );
 

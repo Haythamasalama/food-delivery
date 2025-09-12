@@ -3,8 +3,13 @@ const MenuItem = db.MenuItem;
 
 exports.addMenuItem = async (req, res) => {
   try {
-    const { name, description, price } = req.body;
-    const newItem = await MenuItem.create({ name, description, price });
+    const { name, description, price, restaurantId } = req.body;
+    const newItem = await MenuItem.create({
+      name,
+      description,
+      price,
+      restaurantId,
+    });
     res.status(201).send({ message: "Menu item added successfully", newItem });
   } catch (error) {
     res.status(500).send({ message: error.message });

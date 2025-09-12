@@ -3,12 +3,7 @@ const DriverLocation = db.DriverLocation;
 const Driver = db.Driver;
 const Order = db.Order;
 
-let socketHelpers;
-
-// Inject socket helpers from socket.js
-function setSocket(ioHelpers) {
-  socketHelpers = ioHelpers;
-}
+const socketUtils = require("../utils/socket").helpers;
 
 // REST → WebSocket bridge: driver updates location
 exports.updateLocation = async (req, res) => {
@@ -43,9 +38,8 @@ exports.updateLocation = async (req, res) => {
       });
     }
 
-    // broadcast only to customers of this order
-    if (socketHelpers) {
-      socketHelpers.sendDriverLocation(orderId, {
+    if (socketUtils?.sendDriverLocation) {
+      socketUtils.sendDriverLocation(orderId, {
         driverId,
         lat,
         lng,
@@ -64,5 +58,3 @@ exports.updateLocation = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
-
-module.exports.setSocket = setSocket;

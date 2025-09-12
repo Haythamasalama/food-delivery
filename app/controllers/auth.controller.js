@@ -4,6 +4,7 @@ const db = require("../../db/models");
 const User = db.User;
 const Customer = db.Customer;
 const Driver = db.Driver;
+const Staff = db.Staff;
 const config = require("../../config/auth.config");
 const { blacklistToken } = require("../middlewares/authJwt");
 
@@ -40,6 +41,16 @@ exports.signup = async (req, res) => {
         phone: "",
         vehicleType: "",
         status: "available",
+      });
+    }
+
+    // If role is driver → create row in Drivers table
+    if (role === "staff") {
+      await Staff.create({
+        userId: user.userId,
+        fullName: fullName,
+        phone: "",
+        restaurantId: 1,
       });
     }
 
