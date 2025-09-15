@@ -37,7 +37,8 @@ const verifyToken = (req, res, next) => {
     if (!req.user) {
       req.user = {};
     }
-    req.user.userId = decoded.id; // Store the student ID in the request object
+    req.user.userId = decoded.id;
+    req.user.role = decoded.role;
     next();
   });
 };
@@ -165,6 +166,44 @@ const checkStaff = async (req, res, next) => {
   }
 };
 
+const checkAgent = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).send({ message: `User ${userId} Not found!` });
+    }
+
+    if (user.role === "agent") {
+      return next();
+    }
+
+    res.status(403).send({ message: "Require Agent Role!" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
+
+const checkAgentOrCustomer = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).send({ message: `User ${userId} Not found!` });
+    }
+
+    if (user.role === "agent" || user.role === "customer") {
+      return next();
+    }
+
+    res.status(403).send({ message: "Require Agent or Customer Role!" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
+
 // Add token to blacklist
 const blacklistToken = (token) => {
   blacklist.add(token);
@@ -179,4 +218,6 @@ module.exports = {
   checkAdminOrDriverOrCustomer,
   checkAdminOrDriver,
   checkStaff,
+  checkAgent,
+  checkAgentOrCustomer,
 };

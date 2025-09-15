@@ -15,6 +15,8 @@ const driverRoutes = require("./app/routes/driver.routes");
 const driverLocationRoutes = require("./app/routes/driverLocation.routes");
 const restaurantRoutes = require("./app/routes/restaurant.routes");
 const staffRoutes = require("./app/routes/staff.routes");
+const agentRoutes = require("./app/routes/agent.routes");
+const chatRoutes = require("./app/routes/chat.routes");
 
 const app = express();
 const server = http.createServer(app);
@@ -49,13 +51,8 @@ app.use("/api/driver", driverRoutes);
 app.use("/api/driver-location", driverLocationRoutes);
 app.use("/api/restaurant", restaurantRoutes);
 app.use("/api/staff", staffRoutes);
-
-// const socketHelpers = initSocket(server);
-// init sockets (helpers object is automatically available to all controllers)
-
-// Inject socket into controller
-// const driverLocationController = require("./app/controllers/driverLocation.controller");
-// driverLocationController.setSocket(socketHelpers);
+app.use("/api/agent", agentRoutes);
+app.use("/api/chat", chatRoutes);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

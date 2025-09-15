@@ -29,6 +29,8 @@ db.RestaurantNotification = require("./restaurantNotifications.model")(
   Sequelize
 );
 db.Staff = require("./staff.model")(sequelize, Sequelize);
+db.Agent = require("./agents.model")(sequelize, Sequelize);
+db.ChatMessage = require("./chatMessage.model")(sequelize, Sequelize);
 
 // Establish relationships
 // User → Customer / Driver
@@ -76,5 +78,51 @@ db.RestaurantNotification.belongsTo(db.Order, { foreignKey: "order_id" });
 // Restaurant → Staff
 db.Restaurant.hasMany(db.Staff, { foreignKey: "restaurant_id" });
 db.Staff.belongsTo(db.Restaurant, { foreignKey: "restaurant_id" });
+
+// User → Agent
+db.User.hasOne(db.Agent, { foreignKey: "user_id" });
+db.Agent.belongsTo(db.User, { foreignKey: "user_id" });
+
+// Restaurant → Agent
+db.Restaurant.hasMany(db.Agent, { foreignKey: "restaurant_id" });
+db.Agent.belongsTo(db.Restaurant, { foreignKey: "restaurant_id" });
+
+db.Customer.hasMany(db.ChatMessage, {
+  foreignKey: "sender_id",
+  scope: { senderType: "customer" },
+});
+db.Agent.hasMany(db.ChatMessage, {
+  foreignKey: "sender_id",
+  scope: { senderType: "agent" },
+});
+
+db.ChatMessage.belongsTo(db.Customer, {
+  foreignKey: "sender_id",
+  constraints: false,
+});
+db.ChatMessage.belongsTo(db.Agent, {
+  foreignKey: "sender_id",
+  constraints: false,
+});
+
+db.Customer.hasMany(db.ChatMessage, {
+  foreignKey: "receiver_id",
+  scope: { receiverType: "customer" },
+});
+db.Agent.hasMany(db.ChatMessage, {
+  foreignKey: "receiver_id",
+  scope: { receiverType: "agent" },
+});
+
+db.ChatMessage.belongsTo(db.Customer, {
+  foreignKey: "receiver_id",
+  as: "receiverCustomer",
+  constraints: false,
+});
+db.ChatMessage.belongsTo(db.Agent, {
+  foreignKey: "receiver_id",
+  as: "receiverAgent",
+  constraints: false,
+});
 
 module.exports = db;

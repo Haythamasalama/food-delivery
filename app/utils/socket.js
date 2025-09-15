@@ -28,6 +28,58 @@ const helpers = {
       );
     }
   },
+
+  // Chat: send message
+  sendMessage: async (message) => {
+    if (!helpers.io) return;
+
+    const {
+      senderId,
+      receiverId,
+      senderType,
+      receiverType,
+      message: msg,
+    } = message;
+
+    // Save to DB
+    const saved = await db.ChatMessage.create({
+      senderId,
+      receiverId,
+      senderType,
+      receiverType,
+      message: msg,
+    });
+
+    // Emit to receiver
+    const room = `${receiverType}_${receiverId}`;
+    helpers.io.to(room).emit("newMessage", saved);
+
+    // Emit to sender as confirmation
+    const senderRoom = `${senderType}_${senderId}`;
+    helpers.io.to(senderRoom).emit("messageSent", saved);
+  },
+
+  // Chat: typing indicator
+  sendTyping: (senderType, senderId, receiverType, receiverId, isTyping) => {
+    const room = `${receiverType}_${receiverId}`;
+    helpers.io.to(room).emit("typing", { senderType, senderId, isTyping });
+  },
+
+  // Chat: mark delivered
+  sendDelivered: async (messageId) => {
+    await db.ChatMessage.update(
+      { deliveredAt: new Date() },
+      { where: { messageId } }
+    );
+  },
+
+  // Chat: mark read
+  sendRead: async (messageId) => {
+    await db.ChatMessage.update(
+      { readAt: new Date() },
+      { where: { messageId } }
+    );
+  },
 };
 
 async function initSocket(server) {
@@ -102,6 +154,43 @@ async function initSocket(server) {
       } catch (err) {
         console.error("Error acking notification:", err.message);
       }
+    });
+
+    /*** Chat Rooms ***/
+    // Join chat personal room
+    socket.on("joinChat", ({ userId, userType }) => {
+      const room = `${userType}_${userId}`;
+      socket.join(room);
+      console.log(`${userType} ${userId} joined chat room ${room}`);
+    });
+
+    // Send chat message
+    socket.on("sendMessage", async (data) => {
+      await helpers.sendMessage(data);
+    });
+
+    // Typing indicator
+    socket.on(
+      "typing",
+      ({ senderType, senderId, receiverType, receiverId, isTyping }) => {
+        helpers.sendTyping(
+          senderType,
+          senderId,
+          receiverType,
+          receiverId,
+          isTyping
+        );
+      }
+    );
+
+    // Mark delivered
+    socket.on("delivered", async ({ messageId }) => {
+      await helpers.sendDelivered(messageId);
+    });
+
+    // Mark read
+    socket.on("read", async ({ messageId }) => {
+      await helpers.sendRead(messageId);
     });
 
     // Disconnect cleanup
