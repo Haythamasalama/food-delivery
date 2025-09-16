@@ -34,6 +34,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         field: "price",
       },
+      imageUrl: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        field: "image_url",
+      },
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,

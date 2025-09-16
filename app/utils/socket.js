@@ -233,6 +233,13 @@ async function initSocket(server) {
       }
     });
 
+    // Client joins menu item room to receive upload progress
+    socket.on("joinMenuItemRoom", ({ itemId }) => {
+      const room = `menuItem_${itemId}`;
+      socket.join(room);
+      console.log(`Client ${socket.id} joined menu item room ${room}`);
+    });
+
     // Disconnect cleanup
     socket.on("disconnect", () => {
       console.log("Client disconnected:", socket.id);

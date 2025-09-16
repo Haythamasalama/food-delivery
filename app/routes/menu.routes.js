@@ -13,4 +13,11 @@ router.post(
 // Get all menu items
 router.get("/", menuController.getMenu);
 
+// Upload menu image
+router.post(
+  "/upload-image",
+  [authJwt.verifyToken, authJwt.checkStaff],
+  menuController.uploadMenuItemImage
+);
+
 module.exports = router;
