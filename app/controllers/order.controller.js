@@ -125,3 +125,33 @@ exports.updateStatus = async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 };
+
+// Admin approves or rejects payment
+exports.updatePaymentStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { paymentStatus } = req.body; // 'approved' or 'rejected'
+
+    if (!["approved", "rejected"].includes(paymentStatus)) {
+      return res.status(400).send({ message: "Invalid paymentStatus" });
+    }
+
+    const order = await Order.findByPk(orderId, { include: [Customer] });
+    if (!order) return res.status(404).send({ message: "Order not found" });
+
+    await order.update({ paymentStatus });
+
+    // Notify customer via WebSocket if connected
+    if (helpers.io) {
+      helpers.io.to(`customer_${order.customerId}`).emit("paymentUpdate", {
+        orderId: order.orderId,
+        paymentStatus,
+      });
+    }
+
+    res.status(200).send({ message: "Payment status updated", order });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: error.message });
+  }
+};

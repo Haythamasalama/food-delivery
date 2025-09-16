@@ -240,6 +240,13 @@ async function initSocket(server) {
       console.log(`Client ${socket.id} joined menu item room ${room}`);
     });
 
+    // Customer joins their own room for notifications
+    socket.on("joinCustomerRoom", ({ customerId }) => {
+      const room = `customer_${customerId}`;
+      socket.join(room);
+      console.log(`Customer ${customerId} joined room ${room}`);
+    });
+
     // Disconnect cleanup
     socket.on("disconnect", () => {
       console.log("Client disconnected:", socket.id);

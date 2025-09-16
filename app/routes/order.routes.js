@@ -24,4 +24,11 @@ router.put(
   orderController.updateStatus
 );
 
+// Admin updates payment status
+router.put(
+  "/:orderId/payment",
+  [authJwt.verifyToken, authJwt.checkAdmin],
+  orderController.updatePaymentStatus
+);
+
 module.exports = router;

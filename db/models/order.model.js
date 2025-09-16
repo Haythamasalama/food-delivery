@@ -60,6 +60,12 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         field: "total_price",
       },
+      paymentStatus: {
+        type: Sequelize.ENUM("pending", "approved", "rejected"),
+        defaultValue: "pending",
+        allowNull: false,
+        field: "payment_status",
+      },
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
