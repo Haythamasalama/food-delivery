@@ -193,6 +193,46 @@ async function initSocket(server) {
       await helpers.sendRead(messageId);
     });
 
+    // Announcement
+    socket.on("joinRoleRoom", ({ userId, role }) => {
+      const room = `role_${role}`;
+      socket.join(room);
+      console.log(`User ${userId} with role ${role} joined room ${room}`);
+    });
+
+    // When user reconnects, send pending announcements
+    socket.on("fetchAnnouncements", async ({ role }) => {
+      try {
+        const pending = await db.Announcement.findAll({
+          where: {
+            [db.Sequelize.Op.or]: [
+              db.sequelize.where(
+                db.sequelize.fn(
+                  "JSON_CONTAINS",
+                  db.sequelize.col("audience"),
+                  '"all"'
+                ),
+                true
+              ),
+              db.sequelize.where(
+                db.sequelize.fn(
+                  "JSON_CONTAINS",
+                  db.sequelize.col("audience"),
+                  `"${role}"`
+                ),
+                true
+              ),
+            ],
+          },
+          order: [["createdAt", "DESC"]],
+          limit: 10,
+        });
+        socket.emit("announcementBatch", pending);
+      } catch (err) {
+        console.error("Error fetching announcements for socket:", err.message);
+      }
+    });
+
     // Disconnect cleanup
     socket.on("disconnect", () => {
       console.log("Client disconnected:", socket.id);

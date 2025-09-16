@@ -31,6 +31,7 @@ db.RestaurantNotification = require("./restaurantNotifications.model")(
 db.Staff = require("./staff.model")(sequelize, Sequelize);
 db.Agent = require("./agents.model")(sequelize, Sequelize);
 db.ChatMessage = require("./chatMessage.model")(sequelize, Sequelize);
+db.Announcement = require("./announcements.model")(sequelize, Sequelize);
 
 // Establish relationships
 // User → Customer / Driver

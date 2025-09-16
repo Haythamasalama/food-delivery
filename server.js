@@ -17,6 +17,7 @@ const restaurantRoutes = require("./app/routes/restaurant.routes");
 const staffRoutes = require("./app/routes/staff.routes");
 const agentRoutes = require("./app/routes/agent.routes");
 const chatRoutes = require("./app/routes/chat.routes");
+const announcementRoutes = require("./app/routes/announcement.routes");
 
 const app = express();
 const server = http.createServer(app);
@@ -53,6 +54,7 @@ app.use("/api/restaurant", restaurantRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/agent", agentRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/announcement", announcementRoutes);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
