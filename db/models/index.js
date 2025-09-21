@@ -32,14 +32,31 @@ db.Staff = require("./staff.model")(sequelize, Sequelize);
 db.Agent = require("./agents.model")(sequelize, Sequelize);
 db.ChatMessage = require("./chatMessage.model")(sequelize, Sequelize);
 db.Announcement = require("./announcements.model")(sequelize, Sequelize);
+db.TokenBlacklist = require("./tokenBlacklist.model")(sequelize, Sequelize);
 
 // Establish relationships
 // User → Customer / Driver
-db.User.hasOne(db.Customer, { foreignKey: "user_id" });
-db.Customer.belongsTo(db.User, { foreignKey: "user_id" });
+db.User.hasOne(db.Customer, {
+  foreignKey: "user_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE"
+});
+db.Customer.belongsTo(db.User, {
+  foreignKey: "user_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE"
+});
 
-db.User.hasOne(db.Driver, { foreignKey: "user_id" });
-db.Driver.belongsTo(db.User, { foreignKey: "user_id" });
+db.User.hasOne(db.Driver, {
+  foreignKey: "user_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE"
+});
+db.Driver.belongsTo(db.User, {
+  foreignKey: "user_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE"
+});
 
 // Customer → Order
 db.Customer.hasMany(db.Order, { foreignKey: "customer_id" });
@@ -83,6 +100,10 @@ db.Staff.belongsTo(db.Restaurant, { foreignKey: "restaurant_id" });
 // User → Agent
 db.User.hasOne(db.Agent, { foreignKey: "user_id" });
 db.Agent.belongsTo(db.User, { foreignKey: "user_id" });
+
+// User → TokenBlacklist
+db.User.hasMany(db.TokenBlacklist, { foreignKey: "user_id" });
+db.TokenBlacklist.belongsTo(db.User, { foreignKey: "user_id" });
 
 // Restaurant → Agent
 db.Restaurant.hasMany(db.Agent, { foreignKey: "restaurant_id" });

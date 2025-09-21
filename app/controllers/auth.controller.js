@@ -90,9 +90,9 @@ exports.localLogin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.userId, role: user.role },
+      { id: user.userId, role: user.role, email: user.email },
       config.secret,
-      { expiresIn: "7d" }
+      { expiresIn: process.env.JWT_EXPIRY || "24h" }
     );
 
     res
@@ -116,9 +116,9 @@ exports.googleSuccess = async (req, res) => {
   if (!req.user) return res.status(401).send({ message: "Unauthorized" });
 
   const token = jwt.sign(
-    { id: req.user.userId, role: req.user.role },
+    { id: req.user.userId, role: req.user.role, email: req.user.email },
     config.secret,
-    { expiresIn: "7d" }
+    { expiresIn: process.env.JWT_EXPIRY || "24h" }
   );
 
   res
@@ -139,13 +139,39 @@ exports.googleFailure = (req, res) => {
   res.status(401).send({ message: "Google login failed" });
 };
 
-exports.logout = (req, res) => {
-  let token = req.headers["authorization"];
-  if (!token || !token.startsWith("Bearer ")) {
-    return res.status(400).send({ message: "No token provided" });
-  }
+exports.logout = async (req, res) => {
+  try {
+    let token = req.headers["authorization"];
+    if (!token || !token.startsWith("Bearer ")) {
+      return res.status(400).json({
+        success: false,
+        message: "No token provided"
+      });
+    }
 
-  token = token.split(" ")[1];
-  blacklistToken(token);
-  return res.status(200).send({ message: "Logged out successfully." });
+    token = token.split(" ")[1];
+
+    // Use the new blacklistToken function with proper error handling
+    const result = await blacklistToken(token, req.user.userId, 'logout');
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to logout properly"
+      });
+    }
+
+    res.clearCookie('accessToken');
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully."
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error during logout"
+    });
+  }
 };

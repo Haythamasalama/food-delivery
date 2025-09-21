@@ -4,7 +4,18 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "setup": "node scripts/setup.js",
+    "start": "nodemon server.js",
+    "dev": "nodemon server.js",
+    "production": "node server.js",
+    "migrate": "npx sequelize-cli db:migrate",
+    "migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "cleanup:tokens": "node scripts/cleanup-tokens.js",
+    "test:auth": "node scripts/test-auth.js",
+    "test:db": "node scripts/test-db.js",
+    "logs:error": "tail -f logs/error.log",
+    "logs:combined": "tail -f logs/combined.log",
+    "logs:security": "tail -f logs/security.log"
   },
   "author": "Basma Skaik",
   "license": "ISC",
@@ -13,13 +24,17 @@
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
-    "crypto": "^1.0.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
     "express-session": "^1.18.1",
+    "express-validator": "^7.0.1",
     "form-data": "^4.0.4",
+    "helmet": "^7.1.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
     "multer": "^2.0.2",
     "mysql2": "^3.14.0",
     "nodemailer": "^6.10.1",
@@ -32,6 +47,7 @@
     "sequelize-cli": "^6.6.2",
     "sharp": "^0.34.3",
     "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "winston": "^3.11.0"
   }
 }
